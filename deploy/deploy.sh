@@ -1,18 +1,18 @@
 #!/bin/bash
 
-# Деплой pcmanager на VPS с существующим Django проектом
+# Деплой pcmanager на VPS: 170.168.1.221, mikesdemos.ru
 
 set -e
 
 # Конфигурация
 PROJECT_NAME="pcmanager"
 PROJECT_DIR="/var/www/$PROJECT_NAME"
-DOMAIN="pcmanager.yourdomain.com"  # Замените на ваш домен
+DOMAIN="pcmanager.mikesdemos.ru"
 VENV_DIR="$PROJECT_DIR/venv"
 GIT_REPO="https://github.com/MichaelUniHorus/pcmanager.git"
 BRANCH="main"
 
-echo "=== Деплой $PROJECT_NAME ==="
+echo "=== Деплой $PROJECT_NAME на 170.168.1.221 ==="
 
 # 1. Создание директории проекта
 echo "Создание директории проекта..."
@@ -50,9 +50,9 @@ if [ ! -f "$PROJECT_DIR/.env" ]; then
 DEBUG=False
 SECRET_KEY=$(python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
 ALLOWED_HOSTS=$DOMAIN,localhost,127.0.0.1
-DATABASE_URL=postgresql://user:password@localhost/pcmanager_db
+DATABASE_URL=postgresql://pcmanager_user:CHANGE_ME_PASSWORD@localhost/pcmanager_db
 EOF
-    echo "Отредактируйте $PROJECT_DIR/.env для настройки БД"
+    echo "ВНИМАНИЕ: Отредактируйте $PROJECT_DIR/.env и замените CHANGE_ME_PASSWORD на реальный пароль"
 fi
 
 # 6. Миграции
@@ -83,7 +83,8 @@ sudo ln -sf /etc/nginx/sites-available/$PROJECT_NAME /etc/nginx/sites-enabled/$P
 sudo nginx -t && sudo systemctl reload nginx
 
 echo "=== Деплой завершен ==="
-echo "Не забудьте:"
-echo "1. Настроить PostgreSQL базу данных"
-echo "2. Отредактировать $PROJECT_DIR/.env"
-echo "3. Настроить DNS для $DOMAIN"
+echo "Следующие шаги:"
+echo "1. Создать БД PostgreSQL (см. инструкцию ниже)"
+echo "2. Отредактировать $PROJECT_DIR/.env (заменить пароль)"
+echo "3. Добавить DNS запись: pcmanager.mikesdemos.ru → 170.168.1.221"
+echo "4. Настроить SSL: sudo certbot --nginx -d $DOMAIN"
