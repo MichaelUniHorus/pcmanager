@@ -1,6 +1,20 @@
+import environ
+from pathlib import Path
 from .base import *
 
-DEBUG = False
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+env = environ.Env()
+environ.Env.read_env(BASE_DIR / '.env')
+
+DEBUG = env.bool('DEBUG', default=False)
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost'])
+
+# URL prefix for subdirectory deployment
+URL_PREFIX = '/pcmanager'
+STATIC_URL = f'{URL_PREFIX}/static/'
+MEDIA_URL = f'{URL_PREFIX}/media/'
+FORCE_SCRIPT_NAME = URL_PREFIX
 
 DATABASES = {
     'default': {
